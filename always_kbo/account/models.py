@@ -24,6 +24,7 @@ class UserManager(BaseUserManager):
                 age = age,
                 gender = gender,
                 team = team,
+                password = password
             )
         
         user.is_admin = 1
@@ -60,6 +61,7 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['name', 'age', 'gender', 'team']
 
     def __str__(self):
