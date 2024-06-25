@@ -1,14 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from account.serializers import UserSerializer
+from rest_framework.views import APIView
+from account.serializers import UserSerializer, UserInfoSerializer
+from .models import *
 # Create your views here.
 
 @api_view(['POST'])
@@ -52,4 +54,15 @@ def login(request):
                         'access_token': access_token, }, status=status.HTTP_200_OK)
     
     return Response({'message': '아이디 또는 비밀번호가 일치하지 않습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class UserApiView(APIView):
+    def get_object(self, pk):
+        user = get_object_or_404(User, pk=pk)
+        return user
+    
+    def get(self, request, pk):
+        user = self.get_object(pk)
+
+        userSerializer = UserInfoSerializer(user)
+        return Response(userSerializer.data, status = status.HTTP_200_OK)
     
